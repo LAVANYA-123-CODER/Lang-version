@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gemini AI Translator</title>
+  <style>
+    body { font-family: Arial; padding: 30px; max-width: 600px; margin: auto; }
+    textarea, select, button { width: 100%; padding: 10px; margin-top: 10px; font-size: 16px; }
+    #output { margin-top: 20px; font-weight: bold; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>Gemini Sentence Converter</h2>
+
+  <textarea id="inputText" placeholder="Enter your sentence..."></textarea>
+
+  <select id="conversionType">
+    <option value="convincing">Convincing English</option>
+    <option value="kan-english">Kannada (English letters)</option>
+    <option value="hin-english">Hindi (English letters)</option>
+    <option value="kannada">Kannada (Kannada script)</option>
+  </select>
+
+  <button onclick="processInput()">Convert</button>
+
+  <div id="output">Output will appear here...</div>
+
+  <script>
+    async function processInput() {
+      const input = document.getElementById("inputText").value.trim();
+      const type = document.getElementById("conversionType").value;
+      const outputDiv = document.getElementById("output");
+
+      if (!input) {
+        outputDiv.innerText = "Please enter a sentence.";
+        return;
+      }
+
+      let prompt = "";
+      switch (type) {
+        case "convincing":
+          prompt = `Rewrite this sentence in a more convincing and professional way: "${input}"`;
+          break;
+        case "kan-english":
+          prompt = `Translate this sentence into Kannada using English letters: "${input}"`;
+          break;
+        case "hin-english":
+          prompt = `Translate this sentence into Hindi using English letters: "${input}"`;
+          break;
+        case "kannada":
+          prompt = `Translate this sentence into Kannada using Kannada script: "${input}"`;
+          break;
+      }
+
+      outputDiv.innerText = "⏳ Processing...";
+
+      try {
+        const response = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+        outputDiv.innerText = data.result || "No response from Gemini.";
+      } catch (err) {
+        outputDiv.innerText = "❌ Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
